@@ -14,9 +14,10 @@ def main(
     train_path=None,
     val_path=None,
     model_name='resnet18',
-    samples=20, distill_batch=5, distill_iter=4000, lr_g=0.1, lr_z=0.01,
+    samples=1024, distill_batch=128, distill_iter=4000, lr_g=0.1, lr_z=0.01,
     bit_w=4, bit_a=4,
-    recon_iter=20000, recon_batch=32, round_weight=1.0
+    recon_iter=20000, recon_batch=32, round_weight=1.0,
+    visualized=False
 ):
     """Quantize the model with synthetic dataset.
 
@@ -48,23 +49,24 @@ def main(
         train_set = distill_data(
             model, batch_size=distill_batch, total_samples=samples, lr_g=lr_g, lr_z=lr_z, iters=distill_iter)
 
-    #save the distilled data
-    torch.save(train_set, 'distilled_data.pth')
+    if visualized:
+        #save the distilled data
+        torch.save(train_set, 'distilled_data.pth')
 
-    #visualize the distilled data
-    import matplotlib.pyplot as plt
-    # create figure
-    fig = plt.figure(figsize=(10, 7))
-    columns = 4
-    rows = 5
-    for i in range(1, columns*rows +1):
-        img = train_set[i-1].cpu().detach().numpy()
-        fig.add_subplot(rows, columns, i)
-        plt.imshow(img[0], cmap='gray')
+        #visualize the distilled data
+        import matplotlib.pyplot as plt
+        # create figure
+        fig = plt.figure(figsize=(10, 7))
+        columns = 4
+        rows = 5
+        for i in range(1, columns*rows +1):
+            img = train_set[i-1].cpu().detach().numpy()
+            fig.add_subplot(rows, columns, i)
+            plt.imshow(img[0], cmap='gray')
 
-    plt.show()
-
-    exit()
+        plt.show()
+        #save image
+        plt.savefig('distilled_data.png')
 
     qmodel = quantize_model(
     	model, bit_w, bit_a,
