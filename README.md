@@ -1,6 +1,9 @@
 # Genie: Show Me the Data for Quantization
 This repository provides the PyTorch implementation of our CVPR 2023 paper ["Genie: Show Me the Data for Quantization"](https://arxiv.org/abs/2212.04780).
-
+I, Emre Akbulut, added the data distillation visualization of GENIE by choosing a specific model.
+The original repository is [here](
+https://github.com/SamsungLabs/Genie
+).
 ![](./pipeline.png)
 
 ## Getting Started
@@ -15,7 +18,7 @@ pip3 install -r requirements.txt
 python3 main.py --model_name=resnet18 --bit_w=4 --bit_a=4 --samples=1024 --val_path=IMAGENET_PATH/val
 
 # or Few-Shot Quantization (PTQ)
-python3 main.py --model_name=resnet18 --bit_w=4 --bit_a=4 --samples=1024 --train_path=IMAGENET_PATH/train --val_path=IMAGENET_PATH/val 
+python3 main.py --model_name=resnet18 --bit_w=4 --bit_a=4 --samples=1024 --train_path=IMAGENET_PATH/train --val_path=IMAGENET_PATH/val
 ```
 Detailed descriptions of arguments are provided in [main.py](main.py).
 

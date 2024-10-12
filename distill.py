@@ -44,7 +44,7 @@ class SwingConv2d(nn.Module):
         src_x = np.random.randint(self.jitter_size*2+1)
         src_y = np.random.randint(self.jitter_size*2+1)
         input_pad = F.pad(x, [self.jitter_size for i in range(4)], mode='reflect')
-        input_new = input_pad[:, :, src_y:src_y+x.shape[2], src_x:src_x+x.shape[3]] 
+        input_new = input_pad[:, :, src_y:src_y+x.shape[2], src_x:src_x+x.shape[3]]
         assert input_new.shape == x.shape, f'{input_new.shape}, {input_pad.shape}, {x.shape}'
         return self.org_module(input_new)
 
@@ -68,8 +68,8 @@ def distill_data(model, batch_size, total_samples, lr_g=0.1, lr_z=0.01, iters=40
     latent_dim = 256
     eps = 1e-6
 
-    model = copy.deepcopy(model).cuda().eval()
-    
+    model = copy.deepcopy(model).eval()
+
     hooks, bn_stats = [], []
     for name, module in model.named_modules():
         if isinstance(module, nn.Conv2d):
@@ -79,25 +79,26 @@ def distill_data(model, batch_size, total_samples, lr_g=0.1, lr_z=0.01, iters=40
 
         elif isinstance(module, nn.BatchNorm2d):
             hooks.append(ActivationHook(module))
-            bn_stats.append((module.running_mean.detach().clone().cuda(),
-                            torch.sqrt(module.running_var + eps).detach().clone().cuda()))
+            bn_stats.append((module.running_mean.detach().clone(),
+                            torch.sqrt(module.running_var + eps).detach().clone()))
 
     dataset = []
     for i in range(total_samples//batch_size):
         log.info(f'Generate Image ({i*batch_size}/{total_samples})')
         # initialize the criterion, optimizer, and scheduler
-        z = torch.randn(batch_size, latent_dim).cuda().requires_grad_()
-        generator = Generator(latent_dim=latent_dim).cuda()
+        z = torch.randn(batch_size, latent_dim).requires_grad_()
+        generator = Generator(latent_dim=latent_dim)
 
         opt_z = optim.Adam([z], lr=lr_g)
         scheduler_z = optim.lr_scheduler.ReduceLROnPlateau(opt_z, min_lr=1e-4, verbose=False, patience=100)
         opt_g = optim.Adam(generator.parameters(), lr=lr_z)
         scheduler_g = optim.lr_scheduler.ExponentialLR(opt_g, gamma=0.95)
 
-        input_mean = torch.zeros(1, 3).cuda()
-        input_std = torch.ones(1, 3).cuda()
+        input_mean = torch.zeros(1, 3)
+        input_std = torch.ones(1, 3)
 
         for it in range(iters):
+            print(f'{it+1}/{iters}')
             model.zero_grad()
             opt_z.zero_grad()
             opt_g.zero_grad()

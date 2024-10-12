@@ -14,7 +14,7 @@ def main(
     train_path=None,
     val_path=None,
     model_name='resnet18',
-    samples=1024, distill_batch=128, distill_iter=4000, lr_g=0.1, lr_z=0.01,
+    samples=20, distill_batch=5, distill_iter=4000, lr_g=0.1, lr_z=0.01,
     bit_w=4, bit_a=4,
     recon_iter=20000, recon_batch=32, round_weight=1.0
 ):
@@ -37,15 +37,34 @@ def main(
     """
     available_models = ('resnet18', 'resnet50', 'mobilenetv2', 'regnetx_600m', 'regnetx_3200m', 'mnasnet2.0', 'mnasnet1.0', 'mobilenetb')
     assert model_name in available_models, f'{model_name} not exist!'
-    model = get_model(model_name, pretrained=True).cuda().eval()
-    
+    model = get_model(model_name, pretrained=True).eval()
+
     if train_path:
         train_set = get_dataset(train_path, samples)
         train_set = next(iter(torch.utils.data.DataLoader(
             train_set, batch_size=len(train_set), num_workers=4)))[0].cuda()
     else:
+        print('Distilling data...')
         train_set = distill_data(
             model, batch_size=distill_batch, total_samples=samples, lr_g=lr_g, lr_z=lr_z, iters=distill_iter)
+
+    #save the distilled data
+    torch.save(train_set, 'distilled_data.pth')
+
+    #visualize the distilled data
+    import matplotlib.pyplot as plt
+    # create figure
+    fig = plt.figure(figsize=(10, 7))
+    columns = 4
+    rows = 5
+    for i in range(1, columns*rows +1):
+        img = train_set[i-1].cpu().detach().numpy()
+        fig.add_subplot(rows, columns, i)
+        plt.imshow(img[0], cmap='gray')
+
+    plt.show()
+
+    exit()
 
     qmodel = quantize_model(
     	model, bit_w, bit_a,
@@ -62,7 +81,7 @@ def main(
             'DwsConvBlock', 'ConvBlock', # mobilenetb block
             'InvertedResidual', # mobilenetv2, mnasnet block
             'Linear', 'Conv2d' # default
-        ), 
+        ),
         round_weight=round_weight, iterations=recon_iter, batch_size=recon_batch
     )
 
