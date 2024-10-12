@@ -6,8 +6,6 @@ This repository provides the PyTorch implementation of our CVPR 2023 paper ["Gen
 ## Getting Started
 ### Installation
 ```bash
-git clone https://github.com/SamsungLabs/Genie
-cd Genie
 pip3 install -r requirements.txt
 ```
 
