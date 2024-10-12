@@ -1,6 +1,7 @@
 # Genie: Show Me the Data for Quantization
 This repository provides the PyTorch implementation of our CVPR 2023 paper ["Genie: Show Me the Data for Quantization"](https://arxiv.org/abs/2212.04780).
-I, Emre Akbulut, added the data distillation visualization of GENIE by choosing a specific model.
+
+I, Emre Akbulut, added the data distillation visualization of GENIE by choosing a specific model, just after the distillation process. I also added the pipeline of GENIE to show the steps of the process.
 The original repository is [here](
 https://github.com/SamsungLabs/Genie
 ).
