@@ -4,6 +4,7 @@ I, Emre Akbulut, added the data distillation visualization of GENIE by choosing 
 The original repository is [here](
 https://github.com/SamsungLabs/Genie
 ).
+![Visualization](./Resnet18-distill_iter=100.png)
 ![](./pipeline.png)
 
 ## Getting Started
